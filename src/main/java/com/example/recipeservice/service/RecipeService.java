@@ -16,10 +16,19 @@ public class RecipeService {
     @Autowired
     RecipeRepository recipeRepository;
 
-    public RecipeEntity getRecipe() {
+    public RecipeDto getRecipe() {
+
         if (recipeRepository.findAll().isEmpty()) {
             throw  new ResponseStatusException(HttpStatus.NOT_FOUND, "Impossible to find recipe");
-        } else return recipeRepository.findAll().get(0);
+        }
+
+        RecipeEntity recipe = recipeRepository.findAll().get(0);
+        return RecipeDto.builder()
+                .name(recipe.getName())
+                .description(recipe.getDescription())
+                .ingredients(recipe.getIngredients())
+                .directions(recipe.getDirections())
+                .build();
     }
 
     public Map<String, String> postRecipe(RecipeDto recipeDto) {

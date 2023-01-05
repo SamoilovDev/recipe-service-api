@@ -1,11 +1,12 @@
 package com.example.recipeservice.entity;
 
 import com.example.recipeservice.model.RecipeDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Getter @Setter
-@ToString @Builder
+@ToString
 @RequiredArgsConstructor
 @Entity
 @Table(name = "recipe")
@@ -13,6 +14,7 @@ public class RecipeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private Long id;
 
     @Column(name = "name", nullable = false)
