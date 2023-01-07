@@ -14,12 +14,13 @@ public class RecipeController {
     @Autowired
     RecipeService recipeService;
 
-    @GetMapping
-    public ResponseEntity<?> getRecipe() {
-        return ResponseEntity.ok(recipeService.getRecipe());
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getRecipe(@PathVariable Long id) {
+        return ResponseEntity.ok(recipeService.getRecipe(id));
     }
 
-    @PostMapping ResponseEntity<?> postRecipe(@Valid @RequestBody RecipeDto recipe) {
+    @PostMapping ("/new")
+    ResponseEntity<?> postRecipe(@Valid @RequestBody RecipeDto recipe) {
         return ResponseEntity.ok(recipeService.postRecipe(recipe));
     }
 }

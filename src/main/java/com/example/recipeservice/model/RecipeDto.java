@@ -1,8 +1,11 @@
 package com.example.recipeservice.model;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -14,9 +17,9 @@ public class RecipeDto {
     @NotBlank(message = "description is required")
     private String description;
 
-    @NotBlank(message = "ingredients are required")
-    private String ingredients;
+    @NotNull(message = "ingredients are required")
+    private List<String> ingredients;
 
-    @NotBlank(message = "directions are required")
-    private String directions;
+    @NotNull(message = "directions are required")
+    private List<String> directions;
 }

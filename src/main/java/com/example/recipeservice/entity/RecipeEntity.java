@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Getter @Setter
 @ToString
 @RequiredArgsConstructor
@@ -32,7 +35,7 @@ public class RecipeEntity {
     public RecipeEntity(RecipeDto recipeDto) {
         this.name = recipeDto.getName();
         this.description = recipeDto.getDescription();
-        this.ingredients = recipeDto.getIngredients();
-        this.directions = recipeDto.getDirections();
+        this.ingredients = String.join(", ", recipeDto.getIngredients());
+        this.directions = String.join(", ", recipeDto.getDirections());
     }
 }
