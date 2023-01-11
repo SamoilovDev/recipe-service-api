@@ -9,7 +9,13 @@ import java.util.Optional;
 
 @Repository
 public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
+
     Optional<RecipeEntity> findById(Long id);
 
     Optional<RecipeEntity> findByName(String name);
+
+    List<RecipeEntity> findByCategoryIgnoreCaseOrderByPublishTimeDesc(String category);
+
+    List<RecipeEntity> findAllByNameLikeIgnoreCaseOrderByPublishTimeDesc(String name);
 }
+
