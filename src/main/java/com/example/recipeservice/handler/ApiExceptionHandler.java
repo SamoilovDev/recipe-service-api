@@ -1,7 +1,7 @@
 package com.example.recipeservice.handler;
 
 import com.example.recipeservice.model.ApiError;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,7 +13,7 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<?> responseStatusExceptionHandler(ResponseStatusException ex,
-                                                            HttpStatusCode statusCode,
+                                                            HttpStatus statusCode,
                                                             WebRequest request) {
         return new ResponseEntity<>(
                 ApiError.builder()

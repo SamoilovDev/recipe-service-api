@@ -78,7 +78,7 @@ public class ValidationHandler extends ResponseEntityExceptionHandler {
                         .error("Bad Request")
                         .message(errors.entrySet().stream()
                                 .map(e -> e.getKey() + ": " + e.getValue())
-                                .collect(Collectors.joining("\n")))
+                                .collect(Collectors.joining("; ")))
                         .path(request.getDescription(false).replace("uri=", ""))
                         .build()
         );

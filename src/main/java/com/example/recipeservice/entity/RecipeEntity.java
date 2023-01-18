@@ -3,7 +3,11 @@ package com.example.recipeservice.entity;
 import com.example.recipeservice.model.RecipeDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -14,6 +18,7 @@ import java.util.List;
 @Setter
 @RequiredArgsConstructor
 @Entity
+@Embeddable
 @Table(name = "recipe")
 public class RecipeEntity {
 
@@ -37,15 +42,19 @@ public class RecipeEntity {
     @Column(name = "description")
     private String description;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection
     @CollectionTable(name = "ingredients",
-    joinColumns = @JoinColumn(name = "ingredients_id"))
+            joinColumns = @JoinColumn(name = "ingredients_id"))
     private List<String> ingredients;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection
     @CollectionTable(name = "directions",
-    joinColumns = @JoinColumn(name = "directions_id"))
+            joinColumns = @JoinColumn(name = "directions_id"))
     private List<String> directions;
+
+    @ManyToOne(targetEntity = UserEntity.class)
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
     public RecipeEntity copyOf(RecipeDto recipeDto) {
         this.name = recipeDto.getName();
@@ -55,4 +64,10 @@ public class RecipeEntity {
         this.directions = recipeDto.getDirections();
         return this;
     }
+
+    public RecipeEntity setUser(UserEntity user) {
+        this.user = user;
+        return this;
+    }
+
 }
