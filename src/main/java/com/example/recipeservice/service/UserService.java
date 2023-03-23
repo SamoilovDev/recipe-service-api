@@ -25,20 +25,22 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return userRepository.findUserEntityByEmail(email)
-                .orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, "user with this email doesn't exist!"));
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user with this email doesn't exist!")
+                );
     }
 
-    public ResponseEntity<?> createNewUser(RegisterInfoDto registerInfo) {
+    public ResponseEntity<RegisterInfoDto> createNewUser(RegisterInfoDto registerInfo) {
         if (userRepository.findUserEntityByEmail(registerInfo.getEmail()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "user with this email already exists!");
         } else {
             userRepository.save(
-                    new UserEntity().addAuthenticationInfo(
-                            registerInfo.getEmail(),
-                            encoder.encode(registerInfo.getPassword())
-                    )
+                    UserEntity.builder()
+                            .email(registerInfo.getEmail())
+                            .encodedPassword(encoder.encode(registerInfo.getPassword()))
+                            .build()
             );
+
             return ResponseEntity.ok(registerInfo);
         }
     }

@@ -23,10 +23,12 @@ import java.util.stream.Collectors;
 public class ValidationHandler extends ResponseEntityExceptionHandler {
 
     @Override
-    public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-                                                               HttpHeaders httpHeaders,
-                                                               HttpStatusCode statusCode,
-                                                               WebRequest request) {
+    public ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex,
+            HttpHeaders httpHeaders,
+            HttpStatusCode statusCode,
+            WebRequest request
+    ) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors()
                 .forEach( error ->
@@ -52,8 +54,12 @@ public class ValidationHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    public ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers,
-                                                     HttpStatusCode status, WebRequest request) {
+    public ResponseEntity<Object> handleTypeMismatch(
+            TypeMismatchException ex,
+            HttpHeaders headers,
+            HttpStatusCode status,
+            WebRequest request
+    ) {
         return ResponseEntity.badRequest().body(
                 ApiError.builder()
                         .httpStatus(HttpStatus.BAD_REQUEST.value())
@@ -64,8 +70,10 @@ public class ValidationHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ApiError> handleConstraintViolationException(ConstraintViolationException ex,
-                                                                       WebRequest request) {
+    public ResponseEntity<ApiError> handleConstraintViolationException(
+            ConstraintViolationException ex,
+            WebRequest request
+    ) {
         Map<String, String> errors = new HashMap<>();
         ex.getConstraintViolations()
                 .forEach( constraintViolation ->
@@ -85,9 +93,10 @@ public class ValidationHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ApiError> handleDataIntegrityViolationException(DataIntegrityViolationException exception,
-                                                                          WebRequest request) {
-
+    public ResponseEntity<ApiError> handleDataIntegrityViolationException(
+            DataIntegrityViolationException exception,
+            WebRequest request
+    ) {
         return ResponseEntity.badRequest().body(
                 ApiError.builder()
                         .httpStatus(HttpStatus.BAD_REQUEST.value())

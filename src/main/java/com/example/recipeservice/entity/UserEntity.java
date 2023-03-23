@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,7 +16,9 @@ import java.util.List;
 @Table(name = "user")
 @Getter
 @Setter
-@RequiredArgsConstructor
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserEntity implements UserDetails {
 
     @Id
@@ -35,13 +35,6 @@ public class UserEntity implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<RecipeEntity> recipes;
-
-    public UserEntity addAuthenticationInfo(String email, String encodedPassword) {
-        this.email = email;
-        this.encodedPassword = encodedPassword;
-        return this;
-    }
-
 
     /* implemented methods */
     @Override

@@ -3,7 +3,6 @@ package com.example.recipeservice.handler;
 import com.example.recipeservice.model.ApiError;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
@@ -17,10 +16,11 @@ import java.io.PrintWriter;
 @ControllerAdvice
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
-    public void commence(HttpServletRequest request,
-                         HttpServletResponse response,
-                         AuthenticationException authException)
-            throws IOException, ServletException {
+    public void commence(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            AuthenticationException authException
+    ) throws IOException {
 
         ApiError apiError = ApiError.builder()
                 .httpStatus(HttpStatus.BAD_REQUEST.value())

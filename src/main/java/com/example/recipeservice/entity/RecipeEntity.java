@@ -1,7 +1,6 @@
 package com.example.recipeservice.entity;
 
 import com.example.recipeservice.model.RecipeDto;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import lombok.AccessLevel;
@@ -24,7 +23,6 @@ public class RecipeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore
     @Setter(AccessLevel.NONE)
     private Long id;
 
@@ -62,11 +60,6 @@ public class RecipeEntity {
         this.description = recipeDto.getDescription();
         this.ingredients = recipeDto.getIngredients();
         this.directions = recipeDto.getDirections();
-        return this;
-    }
-
-    public RecipeEntity setUser(UserEntity user) {
-        this.user = user;
         return this;
     }
 

@@ -12,9 +12,11 @@ import org.springframework.web.server.ResponseStatusException;
 public class ApiExceptionHandler {
 
     @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<?> responseStatusExceptionHandler(ResponseStatusException ex,
-                                                            HttpStatus statusCode,
-                                                            WebRequest request) {
+    public ResponseEntity<?> responseStatusExceptionHandler(
+            ResponseStatusException ex,
+            HttpStatus statusCode,
+            WebRequest request
+    ) {
         return new ResponseEntity<>(
                 ApiError.builder()
                         .httpStatus(statusCode.value())

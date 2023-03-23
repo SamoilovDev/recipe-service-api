@@ -26,10 +26,12 @@ public class SecurityConfiguration {
     private ApplicationConfiguration configuration;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http,
-                                           AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        http
-                .userDetailsService(userService)
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            AuthenticationManagerBuilder authenticationManagerBuilder,
+            DaoAuthenticationProvider daoAuthenticationProvider
+    ) throws Exception {
+        http.userDetailsService(userService)
                 .httpBasic()
                 .authenticationEntryPoint(restAuthenticationEntryPoint)
                 .and()
@@ -39,7 +41,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/actuator/shutdown").permitAll())
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        authenticationManagerBuilder.authenticationProvider(daoAuthenticationProvider());
+        authenticationManagerBuilder.authenticationProvider(daoAuthenticationProvider);
         return http.build();
     }
 

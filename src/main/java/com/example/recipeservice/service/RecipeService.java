@@ -12,67 +12,66 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
-import java.util.Optional;
+import java.util.Objects;
 
 @Service
 public class RecipeService {
 
     @Autowired
-    RecipeRepository recipeRepository;
+    private RecipeRepository recipeRepository;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
-    public RecipeDto getRecipe(Long id) {
-
-        if (recipeRepository.findById(id).isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Impossible to find recipe");
-        }
-
-        RecipeEntity recipe = recipeRepository.findById(id).get();
-        return RecipeDto.builder()
+    public ResponseEntity<RecipeDto> getRecipe(Long id) {
+        RecipeEntity recipe = recipeRepository.findById(id)
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Impossible to find recipe")
+                );
+        RecipeDto recipeDto = RecipeDto.builder()
                 .name(recipe.getName())
                 .category(recipe.getCategory())
                 .description(recipe.getDescription())
                 .ingredients(recipe.getIngredients())
                 .directions(recipe.getDirections())
                 .build();
+
+        return ResponseEntity.ok(recipeDto);
     }
 
-    public Map<String, Long> postRecipe(RecipeDto recipeDto, UserEntity user) {
-        if (recipeRepository.findByName(recipeDto.getName()).isPresent()) {
-            user.getRecipes().add(
-                    recipeRepository.findByName(recipeDto.getName())
-                            .get()
-                            .copyOf(recipeDto)
-                            .setUser(user)
-            );
-        } else {
-            user.getRecipes().add(new RecipeEntity().copyOf(recipeDto).setUser(user));
-        }
-        userRepository.save(user);
-        return Map.of("id",
-                recipeRepository.findByName(recipeDto.getName()).get().getId()
+    public ResponseEntity<Map<String, Long>> postRecipe(RecipeDto recipeDto, UserEntity user) {
+        RecipeEntity recipe = recipeRepository.findByName(recipeDto.getName())
+                .orElse(new RecipeEntity())
+                .copyOf(recipeDto);
+
+        if (Objects.equals(null, recipe.getUser())) recipe.setUser(user);
+        recipeRepository.save(recipe);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "id",
+                        recipeRepository.findByName(recipeDto.getName()).orElseThrow().getId()
+                )
         );
     }
 
     public ResponseEntity<?> updateRecipe(Long id, RecipeDto recipeDto, UserEntity user) {
-        if (recipeRepository.findById(id).isPresent()) {
-            if (! user.getRecipes().contains(recipeRepository.findById(id).get())) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "you can not update with recipe!");
-            }
+        RecipeEntity foundedRecipe = recipeRepository.findById(id)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Recipe with %d id doesn't exist".formatted(id)
+                        )
+                )
+                .copyOf(recipeDto);
 
-            RecipeEntity recipe = recipeRepository.findById(id)
-                    .get()
-                    .copyOf(recipeDto);
-            recipeRepository.save(recipe);
+        if (Objects.equals(foundedRecipe.getUser(), user) ) {
+            recipeRepository.save(foundedRecipe);
+            user.getRecipes().add(foundedRecipe);
+            userRepository.save(user);
 
-            return ResponseEntity
-                    .status(HttpStatus.NO_CONTENT)
-                    .build();
-        } else throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "Recipe with %d id doesn't exist".formatted(id));
-
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } else throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can not update this recipe!");
 
     }
 
@@ -85,17 +84,16 @@ public class RecipeService {
     }
 
     public ResponseEntity<?> deleteRecipe(Long id, UserEntity user) {
-        Optional<RecipeEntity> optionalRecipe = recipeRepository.findById(id);
+        RecipeEntity foundedRecipe = recipeRepository.findById(id)
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe with this id doesn't exist")
+                );
 
-        if (optionalRecipe.isPresent()
-                && user.getRecipes().contains(optionalRecipe.get())) {
-            recipeRepository.delete(optionalRecipe.get());
+        if (user.getRecipes().contains(foundedRecipe)) {
+            recipeRepository.delete(foundedRecipe);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } else if (optionalRecipe.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "recipe with this id doesn't exist");
-        } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "you can not delete this recipe!");
-        }
+        }  else throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can not delete this recipe!");
+
     }
 
 }

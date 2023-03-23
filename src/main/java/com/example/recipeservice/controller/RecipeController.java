@@ -1,6 +1,5 @@
 package com.example.recipeservice.controller;
 
-import org.springframework.security.access.prepost.PreAuthorize;
 import com.example.recipeservice.entity.UserEntity;
 import com.example.recipeservice.model.RecipeDto;
 import com.example.recipeservice.model.RegisterInfoDto;
@@ -8,6 +7,7 @@ import com.example.recipeservice.service.RecipeService;
 import com.example.recipeservice.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,20 +23,21 @@ public class RecipeController {
 
     @Autowired
     private RecipeService recipeService;
+
     @Autowired
     private UserService userService;
 
     @GetMapping("/recipe/{id}")
     @PreAuthorize(value = "isAuthenticated()")
-    public ResponseEntity<?> getRecipe(@PathVariable @Min(1) Long id) {
-        return ResponseEntity.ok(recipeService.getRecipe(id));
+    public ResponseEntity<RecipeDto> getRecipe(@PathVariable @Min(1) Long id) {
+        return recipeService.getRecipe(id);
     }
 
     @PostMapping ("/recipe/new")
     @PreAuthorize(value = "isAuthenticated()")
-    ResponseEntity<?> postRecipe(@Valid @RequestBody RecipeDto recipe,
-                                 @AuthenticationPrincipal UserEntity user) {
-        return ResponseEntity.ok(recipeService.postRecipe(recipe, user));
+    ResponseEntity<Map<String, Long>> postRecipe(@Valid @RequestBody RecipeDto recipe,
+                                                 @AuthenticationPrincipal UserEntity user) {
+        return recipeService.postRecipe(recipe, user);
     }
 
     @PutMapping("/recipe/{id}")
@@ -58,16 +59,16 @@ public class RecipeController {
 
     @DeleteMapping("/recipe/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> deleteRecipe(@PathVariable Long id,
-                                          @AuthenticationPrincipal UserEntity user) {
+    public ResponseEntity<?> deleteRecipe(@PathVariable Long id, @AuthenticationPrincipal UserEntity user) {
         return recipeService.deleteRecipe(id, user);
     }
 
     @PostMapping("/register")
     @PreAuthorize(value = "permitAll()")
-    public ResponseEntity<?> createNewUser(@Valid @RequestBody RegisterInfoDto registerInfo) {
+    public ResponseEntity<RegisterInfoDto> createNewUser(@Valid @RequestBody RegisterInfoDto registerInfo) {
         return userService.createNewUser(registerInfo);
     }
 
 }
+
 
