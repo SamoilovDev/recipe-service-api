@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -25,7 +26,7 @@ public class ValidationHandler extends ResponseEntityExceptionHandler {
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex,
-            HttpHeaders httpHeaders,
+            @Nullable HttpHeaders httpHeaders,
             HttpStatusCode statusCode,
             WebRequest request
     ) {
@@ -55,9 +56,9 @@ public class ValidationHandler extends ResponseEntityExceptionHandler {
 
     @Override
     public ResponseEntity<Object> handleTypeMismatch(
-            TypeMismatchException ex,
-            HttpHeaders headers,
-            HttpStatusCode status,
+            @Nullable TypeMismatchException ex,
+            @Nullable HttpHeaders headers,
+            @Nullable HttpStatusCode status,
             WebRequest request
     ) {
         return ResponseEntity.badRequest().body(

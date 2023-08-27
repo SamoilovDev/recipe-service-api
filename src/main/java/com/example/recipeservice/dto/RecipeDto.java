@@ -22,8 +22,8 @@ public class RecipeDto {
     @NotBlank(message = "category of recipe is required")
     private String category;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY, value = "date")
     @Builder.Default
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY, value = "date")
     private LocalDateTime publishTime = LocalDateTime.now();
 
     @NotBlank(message = "description is required")

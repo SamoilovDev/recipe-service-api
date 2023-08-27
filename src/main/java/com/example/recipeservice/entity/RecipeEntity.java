@@ -4,8 +4,10 @@ import com.example.recipeservice.dto.RecipeDto;
 import jakarta.persistence.*;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -15,9 +17,11 @@ import java.util.List;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
 @Entity
+@Builder
 @Embeddable
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "recipe")
 public class RecipeEntity {
 

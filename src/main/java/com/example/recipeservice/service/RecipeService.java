@@ -1,8 +1,10 @@
 package com.example.recipeservice.service;
 
+import com.example.recipeservice.dto.RecipeIdDto;
 import com.example.recipeservice.entity.RecipeEntity;
 import com.example.recipeservice.entity.UserEntity;
 import com.example.recipeservice.dto.RecipeDto;
+import com.example.recipeservice.mapper.RecipeMapper;
 import com.example.recipeservice.repository.RecipeRepository;
 import com.example.recipeservice.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -13,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -24,23 +25,20 @@ public class RecipeService {
 
     private final UserRepository userRepository;
 
+    private final RecipeMapper recipeMapper;
+
+    public static final String RECIPE_DOES_NOT_EXIST = "Recipe with this id doesn't exist";
+    public static final String IMPOSSIBLE_TO_DELETE_RECIPE = "You can not delete this recipe!";
+    public static final String IMPOSSIBLE_TO_UPDATE_RECIPE = "You can not update this recipe!";
+
     public ResponseEntity<RecipeDto> getRecipe(Long id) {
         RecipeEntity recipe = recipeRepository
                 .findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Impossible to find recipe"));
-        RecipeDto recipeDto = RecipeDto
-                .builder()
-                .name(recipe.getName())
-                .category(recipe.getCategory())
-                .description(recipe.getDescription())
-                .ingredients(recipe.getIngredients())
-                .directions(recipe.getDirections())
-                .build();
-
-        return ResponseEntity.ok(recipeDto);
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, RECIPE_DOES_NOT_EXIST));
+        return ResponseEntity.ok(recipeMapper.mapRecipeEntityToRecipeDto(recipe));
     }
 
-    public ResponseEntity<Map<String, Long>> postRecipe(RecipeDto recipeDto, UserEntity user) {
+    public ResponseEntity<RecipeIdDto> postRecipe(RecipeDto recipeDto, UserEntity user) {
         RecipeEntity recipe = recipeRepository
                 .findByName(recipeDto.getName())
                 .orElse(new RecipeEntity())
@@ -51,15 +49,12 @@ public class RecipeService {
         }
         recipeRepository.save(recipe);
 
-        return ResponseEntity.ok(
-                Map.of(
-                        "id",
-                        recipeRepository
-                                .findByName(recipeDto.getName())
-                                .orElseThrow()
-                                .getId()
-                )
-        );
+        RecipeIdDto recipeIdDto = RecipeIdDto
+                .builder()
+                .id(recipeRepository.findByName(recipeDto.getName()).orElseThrow().getId())
+                .build();
+
+        return ResponseEntity.ok(recipeIdDto);
     }
 
     @Transactional
@@ -80,32 +75,39 @@ public class RecipeService {
 
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can not update this recipe!");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, IMPOSSIBLE_TO_UPDATE_RECIPE);
         }
     }
 
-    public ResponseEntity<List<RecipeEntity>> getRecipesByQuery(Map<String, String> query) {
-        return ResponseEntity
-                .ok()
-                .body(
-                        query.containsKey("category")
-                                ? recipeRepository.findByCategoryIgnoreCaseOrderByPublishTimeDesc(query.get("category"))
-                                : recipeRepository.findAllByNameLikeIgnoreCaseOrderByPublishTimeDesc(query.get("name"))
-                );
+    public ResponseEntity<List<RecipeDto>> getRecipesByQuery(String category, String name) {
+        if (Objects.nonNull(category) && Objects.nonNull(name)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        } else {
+            List<RecipeEntity> recipeEntities = Objects.nonNull(category)
+                    ? recipeRepository.findByCategoryIgnoreCaseOrderByPublishTimeDesc(category)
+                    : recipeRepository.findAllByNameLikeIgnoreCaseOrderByPublishTimeDesc(name);
+
+            return ResponseEntity
+                    .ok()
+                    .body(
+                            recipeEntities
+                                    .stream()
+                                    .map(recipeMapper::mapRecipeEntityToRecipeDto)
+                                    .toList()
+                    );
+        }
     }
 
-    public ResponseEntity<?> deleteRecipe(Long id, UserEntity user) {
+    public ResponseEntity<Object> deleteRecipe(Long id, UserEntity user) {
         RecipeEntity foundedRecipe = recipeRepository
                 .findById(id)
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe with this id doesn't exist")
-                );
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, RECIPE_DOES_NOT_EXIST));
 
         if (user.getRecipes().contains(foundedRecipe)) {
             recipeRepository.delete(foundedRecipe);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }  else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can not delete this recipe!");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, IMPOSSIBLE_TO_DELETE_RECIPE);
         }
     }
 

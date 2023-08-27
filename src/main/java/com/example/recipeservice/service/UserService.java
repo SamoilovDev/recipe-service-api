@@ -3,7 +3,7 @@ package com.example.recipeservice.service;
 import com.example.recipeservice.entity.UserEntity;
 import com.example.recipeservice.dto.RegisterInfoDto;
 import com.example.recipeservice.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,17 +14,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
+@RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    PasswordEncoder encoder;
+    private final PasswordEncoder encoder;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userRepository.findUserEntityByEmail(email)
+        return userRepository
+                .findUserEntityByEmail(email)
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user with this email doesn't exist!")
                 );
@@ -35,7 +35,8 @@ public class UserService implements UserDetailsService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "user with this email already exists!");
         } else {
             userRepository.save(
-                    UserEntity.builder()
+                    UserEntity
+                            .builder()
                             .email(registerInfo.getEmail())
                             .encodedPassword(encoder.encode(registerInfo.getPassword()))
                             .build()
