@@ -1,4 +1,4 @@
-package com.example.recipeservice.model;
+package com.example.recipeservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;

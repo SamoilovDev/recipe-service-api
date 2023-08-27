@@ -1,6 +1,6 @@
 package com.example.recipeservice.handler;
 
-import com.example.recipeservice.model.ApiError;
+import com.example.recipeservice.dto.ApiErrorDto;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +22,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
             AuthenticationException authException
     ) throws IOException {
 
-        ApiError apiError = ApiError.builder()
+        ApiErrorDto apiErrorDto = ApiErrorDto.builder()
                 .httpStatus(HttpStatus.BAD_REQUEST.value())
                 .error("Bad Request")
                 .message(authException.getMessage())
@@ -35,7 +35,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
             JsonMapper jsonMapper = new JsonMapper();
             jsonMapper.registerModule(new JavaTimeModule());
 
-            writer.print(jsonMapper.writeValueAsString(apiError));
+            writer.print(jsonMapper.writeValueAsString(apiErrorDto));
         }
     }
 

@@ -1,14 +1,14 @@
 package com.example.recipeservice.controller;
 
 import com.example.recipeservice.entity.UserEntity;
-import com.example.recipeservice.model.RecipeDto;
-import com.example.recipeservice.model.RegisterInfoDto;
+import com.example.recipeservice.dto.RecipeDto;
+import com.example.recipeservice.dto.RegisterInfoDto;
 import com.example.recipeservice.service.RecipeService;
 import com.example.recipeservice.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,14 +18,13 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api")
 public class RecipeController {
 
-    @Autowired
-    private RecipeService recipeService;
+    private final RecipeService recipeService;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @GetMapping("/recipe/{id}")
     @PreAuthorize(value = "isAuthenticated()")
@@ -42,19 +41,19 @@ public class RecipeController {
 
     @PutMapping("/recipe/{id}")
     @PreAuthorize(value = "isAuthenticated()")
-    public ResponseEntity<?> updateRecipe(@PathVariable @Min(1) Long id,
-                                          @Valid @RequestBody RecipeDto recipeDto,
-                                          @AuthenticationPrincipal UserEntity user) {
+    public ResponseEntity<Object> updateRecipe(
+            @PathVariable @Min(1) Long id,
+            @Valid @RequestBody RecipeDto recipeDto,
+            @AuthenticationPrincipal UserEntity user) {
         return recipeService.updateRecipe(id, recipeDto, user);
     }
 
     @GetMapping("/recipe/search")
     @PreAuthorize(value = "isAuthenticated()")
     public ResponseEntity<?> searchAndGetRecipe(@RequestParam Map<String, String> searchQuery) {
-        if (searchQuery.keySet().size() == 1 &&
-                (searchQuery.containsKey("category") || searchQuery.containsKey("name"))) {
+        if (searchQuery.keySet().size() == 1 && (searchQuery.containsKey("category") || searchQuery.containsKey("name"))) {
             return recipeService.getRecipesByQuery(searchQuery);
-        } else throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "");
+        } else throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
 
     @DeleteMapping("/recipe/{id}")

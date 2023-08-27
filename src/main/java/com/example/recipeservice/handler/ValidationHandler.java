@@ -1,6 +1,6 @@
 package com.example.recipeservice.handler;
 
-import com.example.recipeservice.model.ApiError;
+import com.example.recipeservice.dto.ApiErrorDto;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -36,7 +36,7 @@ public class ValidationHandler extends ResponseEntityExceptionHandler {
                 );
 
         return new ResponseEntity<>(
-                ApiError.builder()
+                ApiErrorDto.builder()
                         .httpStatus(statusCode.value())
                         .error("Bad Request")
                         .message(
@@ -61,7 +61,7 @@ public class ValidationHandler extends ResponseEntityExceptionHandler {
             WebRequest request
     ) {
         return ResponseEntity.badRequest().body(
-                ApiError.builder()
+                ApiErrorDto.builder()
                         .httpStatus(HttpStatus.BAD_REQUEST.value())
                         .error("Bad request")
                         .path(request.getDescription(false).replace("uri=", ""))
@@ -70,7 +70,7 @@ public class ValidationHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ApiError> handleConstraintViolationException(
+    public ResponseEntity<ApiErrorDto> handleConstraintViolationException(
             ConstraintViolationException ex,
             WebRequest request
     ) {
@@ -81,7 +81,7 @@ public class ValidationHandler extends ResponseEntityExceptionHandler {
         );
 
         return ResponseEntity.badRequest().body(
-                ApiError.builder()
+                ApiErrorDto.builder()
                         .httpStatus(HttpStatus.BAD_REQUEST.value())
                         .error("Bad Request")
                         .message(errors.entrySet().stream()
@@ -93,12 +93,12 @@ public class ValidationHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ApiError> handleDataIntegrityViolationException(
+    public ResponseEntity<ApiErrorDto> handleDataIntegrityViolationException(
             DataIntegrityViolationException exception,
             WebRequest request
     ) {
         return ResponseEntity.badRequest().body(
-                ApiError.builder()
+                ApiErrorDto.builder()
                         .httpStatus(HttpStatus.BAD_REQUEST.value())
                         .error("Bad Request")
                         .message(exception.getMessage())

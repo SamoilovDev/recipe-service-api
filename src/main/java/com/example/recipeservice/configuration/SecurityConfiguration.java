@@ -2,7 +2,7 @@ package com.example.recipeservice.configuration;
 
 import com.example.recipeservice.handler.RestAuthenticationEntryPoint;
 import com.example.recipeservice.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -13,17 +13,15 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfiguration {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
-    @Autowired
-    private ApplicationConfiguration configuration;
+    private final ApplicationConfiguration configuration;
 
     @Bean
     public SecurityFilterChain filterChain(
@@ -31,7 +29,8 @@ public class SecurityConfiguration {
             AuthenticationManagerBuilder authenticationManagerBuilder,
             DaoAuthenticationProvider daoAuthenticationProvider
     ) throws Exception {
-        http.userDetailsService(userService)
+        http
+                .userDetailsService(userService)
                 .httpBasic()
                 .authenticationEntryPoint(restAuthenticationEntryPoint)
                 .and()
@@ -41,7 +40,9 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/actuator/shutdown").permitAll())
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
         authenticationManagerBuilder.authenticationProvider(daoAuthenticationProvider);
+
         return http.build();
     }
 

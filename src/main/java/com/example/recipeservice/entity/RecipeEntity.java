@@ -1,6 +1,6 @@
 package com.example.recipeservice.entity;
 
-import com.example.recipeservice.model.RecipeDto;
+import com.example.recipeservice.dto.RecipeDto;
 import jakarta.persistence.*;
 
 import lombok.AccessLevel;
@@ -22,8 +22,8 @@ import java.util.List;
 public class RecipeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "name")
@@ -32,26 +32,34 @@ public class RecipeEntity {
     @Column(name = "category")
     private String category;
 
+    @UpdateTimestamp
     @Column(name = "date")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    @UpdateTimestamp
     private LocalDateTime publishTime;
 
     @Column(name = "description")
     private String description;
 
     @ElementCollection
-    @CollectionTable(name = "ingredients",
-            joinColumns = @JoinColumn(name = "ingredients_id"))
+    @CollectionTable(
+            name = "ingredients",
+            joinColumns = {
+                    @JoinColumn(name = "ingredients_id")
+            }
+    )
     private List<String> ingredients;
 
     @ElementCollection
-    @CollectionTable(name = "directions",
-            joinColumns = @JoinColumn(name = "directions_id"))
+    @CollectionTable(
+            name = "directions",
+            joinColumns = {
+                    @JoinColumn(name = "directions_id")
+            }
+    )
     private List<String> directions;
 
-    @ManyToOne(targetEntity = UserEntity.class)
     @JoinColumn(name = "user_id")
+    @ManyToOne(targetEntity = UserEntity.class)
     private UserEntity user;
 
     public RecipeEntity copyOf(RecipeDto recipeDto) {

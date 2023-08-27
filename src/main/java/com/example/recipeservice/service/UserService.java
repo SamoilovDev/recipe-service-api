@@ -1,7 +1,7 @@
 package com.example.recipeservice.service;
 
 import com.example.recipeservice.entity.UserEntity;
-import com.example.recipeservice.model.RegisterInfoDto;
+import com.example.recipeservice.dto.RegisterInfoDto;
 import com.example.recipeservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

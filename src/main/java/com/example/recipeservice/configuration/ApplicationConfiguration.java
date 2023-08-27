@@ -22,7 +22,7 @@ public class ApplicationConfiguration {
                 .registerModule(new JavaTimeModule())
                 .setTimeZone(TimeZone.getDefault())
                 .setDateFormat(DateFormat.getDateInstance())
-                .setDefaultLeniency(false)
+                .setDefaultLeniency(Boolean.FALSE)
                 .enable(SerializationFeature.INDENT_OUTPUT);
     }
 

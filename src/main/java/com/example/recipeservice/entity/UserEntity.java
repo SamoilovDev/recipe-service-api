@@ -25,12 +25,12 @@ public class UserEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Email(regexp = "^[-.\\w]+@\\w+\\.\\w+$", message = "Email is not valid!")
     @Column(name = "email", nullable = false, unique = true)
+    @Email(regexp = "^[-.\\w]+@\\w+\\.\\w+$", message = "Email is not valid!")
     private String email;
 
-    @NotBlank(message = "encoded password is required!")
     @Column(name = "encoded_pass", nullable = false)
+    @NotBlank(message = "encoded password is required!")
     private String encodedPassword;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)

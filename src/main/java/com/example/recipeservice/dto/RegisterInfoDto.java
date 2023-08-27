@@ -1,4 +1,4 @@
-package com.example.recipeservice.model;
+package com.example.recipeservice.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
